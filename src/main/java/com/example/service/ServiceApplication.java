@@ -19,20 +19,4 @@ public class ServiceApplication {
         System.out.println(hourHasPassed.getTime());
     }
 
-    private static final String ORDERS_DESTINATION = "orders";
-
-    @Bean
-    Binding binding(Queue queue, Exchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with(ORDERS_DESTINATION).noargs();
-    }
-
-    @Bean
-    Queue queue() {
-        return QueueBuilder.durable().build();
-    }
-
-    @Bean
-    Exchange exchange() {
-        return ExchangeBuilder.directExchange(ORDERS_DESTINATION).durable(true).build();
-    }
 }

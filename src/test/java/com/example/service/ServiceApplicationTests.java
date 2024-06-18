@@ -9,14 +9,10 @@ class ServiceApplicationTests {
 
 	@Test
 	void contextLoads() {
-
-		var modules = ApplicationModules.of( ServiceApplication.class) ;
+		var modules = ApplicationModules.of(ServiceApplication.class);
 		for (var m : modules)
-			System.out.println(m.getName() + ":"+
-					 m.getBasePackage());
-
+			System.out.println(m.getName() + ":" + m.getBasePackage());
 		modules.verify();
-
 	}
 
 }

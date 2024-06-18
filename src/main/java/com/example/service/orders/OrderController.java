@@ -7,6 +7,7 @@ import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.modulith.ApplicationModuleInitializer;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,20 +19,34 @@ import java.util.Set;
 @RequestMapping("/orders")
 @Controller
 @ResponseBody
-@Transactional
 class OrderController {
 
-    private final OrderRepository repository;
+    private final OrderService orderService;
 
-    private final ApplicationEventPublisher publisher;
-
-    OrderController(OrderRepository repository, ApplicationEventPublisher publisher) {
-        this.repository = repository;
-        this.publisher = publisher;
+    OrderController(OrderService orderService) {
+        this.orderService = orderService;
     }
 
     @PostMapping
     void placeOrder(@RequestBody Order order) {
+        this.orderService.placeOrder(order);
+    }
+}
+
+@Service
+@Transactional
+class OrderService {
+
+    private final ApplicationEventPublisher publisher;
+
+    private final OrderRepository repository;
+
+    OrderService(ApplicationEventPublisher publisher, OrderRepository repository) {
+        this.publisher = publisher;
+        this.repository = repository;
+    }
+
+    void placeOrder(Order order) {
         var saved = this.repository.save(order);
         System.out.println("saved [" + saved + "]");
         saved.lineItems()
@@ -39,6 +54,7 @@ class OrderController {
                 .map(li -> new OrderPlacedEvent(li.id(), li.quantity(), li.product()))
                 .forEach(this.publisher::publishEvent);
     }
+
 }
 
 @Component
